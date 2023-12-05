@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-
+import { useFormik } from 'formik';
 import Resume from "./Resume";
 import Nav from "./Nav";
+import axios from "axios";
+import { Toaster, toast } from "sonner";
 
 const TemplateData = () => {
   const [data, setData] = useState({});
@@ -34,7 +36,81 @@ const TemplateData = () => {
     projectStartDate: {},
     projectEndDate: {},
   });
-
+  const formik = useFormik({
+    initialValues: {
+      name:"",
+      email:"",
+      phone:"",
+      location:"",
+      type: "",
+      summary: '',
+      wanted_job_title: '',
+      skills: '',
+      header_color: "",
+      header_text_color: "",
+      employments: [],
+      educations: [],
+      projects: [],
+    },
+    onSubmit: values => {
+      const data1={
+      name:data?.name,
+      email:data?.email,
+      phone:data?.phone,
+      location:data?.location,
+      type: type,
+      summary: data?.summary,
+      wanted_job_title: data?.wantedJobTitle,
+      skills: data?.skills,
+      header_color: headerColor,
+      header_text_color: headerTextColor,
+      employments:Object?.keys(employment?.jobTitles)?.map((key, index) => ({
+        company: employment?.emp[`emp${index + 1}`],
+        job_title: employment?.jobTitles[key],
+        job_description: employment?.jobDesc[`jobDesc${index + 1}`],
+        start_date: employment?.jobStartDate[`jobStartDate${index + 1}`],
+        end_date: employment?.jobEndDate[`jobEndDate${index + 1}`],
+      })),
+      educations: Object?.keys(education?.qual)?.map((key, index) => ({
+        education_institute: education?.edu[`educ${index + 1}`],
+        qualification: education?.qual[key],
+        edu_description: education?.eduDesc[`eduDesc${index + 1}`],
+        start_date: education?.eduStartDate[`eduStartDate${index + 1}`],
+        end_date: education?.eduEndDate[`eduEndDate${index + 1}`],
+      })),
+      projects: Object?.keys(project?.projectTitles)?.map((key, index) => ({
+        project_title: project?.projectTitles[key],
+        project_description: project?.projectDesc[`projectDesc${index + 1}`],
+        start_date: project?.projectStartDate[`projectStartDate${index + 1}`],
+        end_date: project?.projectEndDate[`projectEndDate${index + 1}`],
+      })),
+      }
+      console.log(data1);
+      const uploadtemplate = async () => {
+        try {
+          await axios
+            .post(
+              "http://localhost:8000/api/cv-templates/",
+              data1
+            )
+            .then((response)=> {
+              toast.success("CV Uploaded Successfully")
+              console.log(response.data);
+             
+              
+            });
+        } catch (e) {
+          toast.error("Try Again")
+          console.log(e);
+        }
+      };
+  
+      uploadtemplate();
+    
+    },
+  });
+  console.log(employment);
+  console.log(education);
   const handleChange = (e) => {
     const { name, value } = e.target;
   
@@ -311,10 +387,19 @@ const TemplateData = () => {
   };
 
   return (
+    <>
+    <Toaster richColors/>
     <div className="w-full mx-auto h-full bg-gray-100 text-gray-900 font-sans">
         <div className="flex p-3 print:p-0">
-          <form className="w-2/5 flex flex-col justify-evenly print:hidden">
+          <form className="w-2/5 flex flex-col justify-evenly print:hidden" onSubmit={formik.handleSubmit}>
+          <button type="submit"
+          className="z-10 rounded bg-blue-500 text-white m-2 py-2 px-5 text-center print:hidden">
+          Upload CV
+        </button>
             <h3 className="w-4/5 m-2 text-xl">Template Type</h3>
+         
+
+
             <select
               className="w-4/5 p-2 m-2 rounded"
               name="templates"
@@ -440,6 +525,7 @@ const TemplateData = () => {
             </button>
             {eduTemplate.map((el) => el)}
           </form>
+         
           <Resume
             userData={data}
             empData={employment}
@@ -454,6 +540,7 @@ const TemplateData = () => {
           />
         </div>
       </div>
+      </>
   );
 };
 

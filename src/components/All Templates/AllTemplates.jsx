@@ -1,212 +1,15 @@
 import { Fragment, useEffect, useState } from "react";
-import {
-  Dialog,
-  Disclosure,
-  Menu,
-  Popover,
-  Tab,
-  Transition,
-} from "@headlessui/react";
-import {
-  Bars3Icon,
-  MagnifyingGlassIcon,
-  ShoppingCartIcon,
-  UserIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+
 import axios from "axios";
-const currencies = ["CAD", "USD", "AUD", "EUR", "GBP"];
-const navigation = {
-  categories: [
-    {
-      name: "Women",
-      featured: [
-        { name: "Sleep", href: "#" },
-        { name: "Swimwear", href: "#" },
-        { name: "Underwear", href: "#" },
-      ],
-      collection: [
-        { name: "Everything", href: "#" },
-        { name: "Core", href: "#" },
-        { name: "New Arrivals", href: "#" },
-        { name: "Sale", href: "#" },
-      ],
-      categories: [
-        { name: "Basic Tees", href: "#" },
-        { name: "Artwork Tees", href: "#" },
-        { name: "Bottoms", href: "#" },
-        { name: "Underwear", href: "#" },
-        { name: "Accessories", href: "#" },
-      ],
-      brands: [
-        { name: "Full Nelson", href: "#" },
-        { name: "My Way", href: "#" },
-        { name: "Re-Arranged", href: "#" },
-        { name: "Counterfeit", href: "#" },
-        { name: "Significant Other", href: "#" },
-      ],
-    },
-    {
-      name: "Men",
-      featured: [
-        { name: "Casual", href: "#" },
-        { name: "Boxers", href: "#" },
-        { name: "Outdoor", href: "#" },
-      ],
-      collection: [
-        { name: "Everything", href: "#" },
-        { name: "Core", href: "#" },
-        { name: "New Arrivals", href: "#" },
-        { name: "Sale", href: "#" },
-      ],
-      categories: [
-        { name: "Artwork Tees", href: "#" },
-        { name: "Pants", href: "#" },
-        { name: "Accessories", href: "#" },
-        { name: "Boxers", href: "#" },
-        { name: "Basic Tees", href: "#" },
-      ],
-      brands: [
-        { name: "Significant Other", href: "#" },
-        { name: "My Way", href: "#" },
-        { name: "Counterfeit", href: "#" },
-        { name: "Re-Arranged", href: "#" },
-        { name: "Full Nelson", href: "#" },
-      ],
-    },
-  ],
-  pages: [
-    { name: "Company", href: "#" },
-    { name: "Stores", href: "#" },
-  ],
-};
-const breadcrumbs = [
-  { id: 1, name: "Objects", href: "#" },
-  { id: 2, name: "Workspace", href: "#" },
-  { id: 3, name: "Sale", href: "#" },
-];
-const sortOptions = [
-  { name: "Most Popular", href: "#", current: true },
-  { name: "Best Rating", href: "#", current: false },
-  { name: "Newest", href: "#", current: false },
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
-];
-const filters = [
-  {
-    id: "category",
-    name: "Category",
-    options: [
-      { value: "new-arrivals", label: "All New Arrivals", checked: false },
-      { value: "tees", label: "Tees", checked: false },
-      { value: "objects", label: "Objects", checked: true },
-      { value: "sweatshirts", label: "Sweatshirts", checked: false },
-      { value: "pants-shorts", label: "Pants & Shorts", checked: false },
-    ],
-  },
-  {
-    id: "color",
-    name: "Color",
-    options: [
-      { value: "white", label: "White", checked: false },
-      { value: "beige", label: "Beige", checked: false },
-      { value: "blue", label: "Blue", checked: false },
-      { value: "brown", label: "Brown", checked: false },
-      { value: "green", label: "Green", checked: false },
-      { value: "purple", label: "Purple", checked: false },
-    ],
-  },
-  {
-    id: "sizes",
-    name: "Sizes",
-    options: [
-      { value: "xs", label: "XS", checked: false },
-      { value: "s", label: "S", checked: false },
-      { value: "m", label: "M", checked: false },
-      { value: "l", label: "L", checked: false },
-      { value: "xl", label: "XL", checked: false },
-      { value: "2xl", label: "2XL", checked: false },
-    ],
-  },
-];
-const activeFilters = [{ value: "objects", label: "Objects" }];
-const products = [
-  {
-    id: 1,
-    name: "Earthen Bottle",
-    href: "#",
-    price: "$48",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg",
-    imageAlt:
-      "Tall slender porcelain bottle with natural clay textured body and cork stopper.",
-  },
-  {
-    id: 2,
-    name: "Nomad Tumbler",
-    href: "#",
-    price: "$35",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-02.jpg",
-    imageAlt:
-      "Olive drab green insulated bottle with flared screw lid and flat top.",
-  },
-  {
-    id: 3,
-    name: "Focus Paper Refill",
-    href: "#",
-    price: "$89",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-03.jpg",
-    imageAlt:
-      "Person using a pen to cross a task off a productivity paper card.",
-  },
-  {
-    id: 4,
-    name: "Machined Mechanical Pencil",
-    href: "#",
-    price: "$35",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-04.jpg",
-    imageAlt:
-      "Hand holding black machined steel mechanical pencil with brass tip and top.",
-  },
-  // More products...
-];
-const footerNavigation = {
-  products: [
-    { name: "Bags", href: "#" },
-    { name: "Tees", href: "#" },
-    { name: "Objects", href: "#" },
-    { name: "Home Goods", href: "#" },
-    { name: "Accessories", href: "#" },
-  ],
-  company: [
-    { name: "Who we are", href: "#" },
-    { name: "Sustainability", href: "#" },
-    { name: "Press", href: "#" },
-    { name: "Careers", href: "#" },
-    { name: "Terms & Conditions", href: "#" },
-    { name: "Privacy", href: "#" },
-  ],
-  customerService: [
-    { name: "Contact", href: "#" },
-    { name: "Shipping", href: "#" },
-    { name: "Returns", href: "#" },
-    { name: "Warranty", href: "#" },
-    { name: "Secure Payments", href: "#" },
-    { name: "FAQ", href: "#" },
-    { name: "Find a store", href: "#" },
-  ],
-};
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 const AllTemplates = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [getAlltemplates, setGetAlltemplates] = useState([]);
+  const [selectedType, setSelectedType] = useState("All");
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
@@ -222,53 +25,101 @@ const AllTemplates = () => {
     };
     fetchTemplate();
   }, []);
+
+  const filteredTemplates = getAlltemplates.filter((template) => {
+    const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = selectedType === "All" || template.type === selectedType;
+    return matchesSearch && matchesType;
+  });
   return (
     <div className="bg-gray-50">
       <div>
         <main>
-          <div className="bg-white">
-            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                Workspace sale
-              </h1>
-              <p className="mt-4 max-w-xl text-sm text-gray-700">
-                Our thoughtfully designed workspace objects are crafted in
-                limited runs. Improve your productivity and organization with
-                these sale items before we run out.
-              </p>
-            </div>
-          </div>
+          
 
-          {/* Product grid */}
+          
           <section
             aria-labelledby="products-heading"
-            className="mx-auto max-w-7xl  pb-16 pt-12 sm:px-2 sm:pb-24 sm:pt-16 lg:max-w-7xl "
+            className="mx-auto max-w-7xl  pb-16 pt-12 sm:px-2 sm:pb-24 sm:pt-10 lg:max-w-7xl "
           >
-            <h2 id="products-heading" className="sr-only">
-              Products
+            <h2
+              id="products-heading"
+              className="text-3xl font-semibold text-center mb-5"
+            >
+              CV Templates
             </h2>
+            <div className="flex justify-center mb-4 gap-x-2">
+              <div className="-mx-1 px-2 py-2 w-1/2">
+                <label
+                  htmlFor="inputField1"
+                  className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+                >
+                  Search
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-400 dark:text-gray-400"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="inputField1"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-gray-50 border w-full shadow-md border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block py-3 pl-10 p-2.5 "
+                    placeholder="Search User Name"
+                  />
+                </div>
+              </div>
+              <div>
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="mt-2 p-3 border border-gray-300 rounded-md"
+                >
+                  <option value="All">All</option>
+                  <option value="two-column">Two-Column</option>
+              <option value="minimalist">Minimalist</option>
+              <option value="Column">Column</option>
+                </select>
+              </div>
+            </div>
 
-            <div className="grid grid-cols-1 gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 xl:gap-x-1">
-              {getAlltemplates.map((product) => (
+            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 xl:gap-x-1">
+              {filteredTemplates?.map((product) => (
                 <div key={product?.id} href={product?.href} className="group">
-                { product?.type==="Two Column"? <div
+                { product?.type==="two-column"? <div
                     style={{
                       boxSizing: "border-box",
                       margin: "0 auto",
                       width: "6.5in",
-                      height: "11in",
+                      height: "14in",
+
                       backgroundColor: "#fff",
                       boxShadow: "0 3px 8px -3px rgba(0, 0, 0, 0.7)",
                     }}
                   >
                     <header
                       style={{ color: `${product.header_text_color}` }}
-                      className="flex flex-col justify-center items-start font-sans w-full h-1/6"
+                      className="flex flex-col justify-center items-start font-sans w-full h-44"
                     >
-                      <div className="bg-gray-100 h-1/6 w-1/4"></div>
+                     
                       <div
                         style={{ backgroundColor: `${product.header_color}` }}
-                        className="flex flex-col items-start justify-center px-5 h-5/6 w-full"
+                        className="flex flex-col items-start justify-center px-5 h-full w-full"
                       >
                         <div className="text-3xl">{product.name}</div>
                         <div className="text-lg pt-3">
@@ -463,17 +314,17 @@ const AllTemplates = () => {
             </section>
                       </div>
                     </div>
-                  </div>:product.type==="Minimalist"?(  <div
+                  </div>:product.type==="minimalist"?(  <div
       style={{
         boxSizing: "border-box",
         margin: "0 auto",
         width: "6.5in",
-        height: "11in",
+        height: "14in",
         backgroundColor: "#fff",
         boxShadow: "0 3px 8px -3px rgba(0, 0, 0, 0.7)",
       }}
     >
-        <header style={{backgroundColor: `${product?.header_color}`, color: `${product?.header_text_color}`}} className="flex gap-10 items-center font-sans w-full h-1/6">
+        <header style={{backgroundColor: `${product?.header_color}`, color: `${product?.header_text_color}`}} className="flex gap-10 items-center font-sans w-full pl-4 h-1/6">
           <div className="flex flex-col  w-[46rem] px-2">
             <div className="text-2xl">{product?.name}</div>
             <div className="text-lg pt-3">{product?.wanted_job_title}</div>
@@ -658,14 +509,14 @@ const AllTemplates = () => {
     boxSizing: "border-box",
     margin: "0 auto",
     width: "6.5in",
-    height: "11in",
+    height: "14in",
     backgroundColor: "#fff",
     boxShadow: "0 3px 8px -3px rgba(0, 0, 0, 0.7)",
   }}
   >
-  <div class="bg-gray-100 p-4">
+  <div class=" p-4">
   
-  <div class="border-1 shadow-lg shadow-gray-700 rounded-lg">
+  <div class="border-1 ">
   
   {/* <!-- top content --> */}
   <div style={{color: `${product?.header_text_color}`,backgroundColor: `${product?.header_color}`}} class="flex rounded-t-lg bg-top-color sm:px-2 w-full">
@@ -1038,121 +889,7 @@ const AllTemplates = () => {
           </section>
         </main>
 
-        <footer
-          aria-labelledby="footer-heading"
-          className="border-t border-gray-200 bg-white"
-        >
-          <h2 id="footer-heading" className="sr-only">
-            Footer
-          </h2>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="py-20">
-              <div className="grid grid-cols-1 md:grid-flow-col md:auto-rows-min md:grid-cols-12 md:gap-x-8 md:gap-y-16">
-                {/* Image section */}
-                <div className="col-span-1 md:col-span-2 lg:col-start-1 lg:row-start-1">
-                  <img
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    alt=""
-                    className="h-8 w-auto"
-                  />
-                </div>
-
-                {/* Sitemap sections */}
-                <div className="col-span-6 mt-10 grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-8 md:col-start-3 md:row-start-1 md:mt-0 lg:col-span-6 lg:col-start-2">
-                  <div className="grid grid-cols-1 gap-y-12 sm:col-span-2 sm:grid-cols-2 sm:gap-x-8">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">
-                        Products
-                      </h3>
-                      <ul role="list" className="mt-6 space-y-6">
-                        {footerNavigation.products.map((item) => (
-                          <li key={item.name} className="text-sm">
-                            <a
-                              href={item.href}
-                              className="text-gray-500 hover:text-gray-600"
-                            >
-                              {item.name}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">
-                        Company
-                      </h3>
-                      <ul role="list" className="mt-6 space-y-6">
-                        {footerNavigation.company.map((item) => (
-                          <li key={item.name} className="text-sm">
-                            <a
-                              href={item.href}
-                              className="text-gray-500 hover:text-gray-600"
-                            >
-                              {item.name}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-900">
-                      Customer Service
-                    </h3>
-                    <ul role="list" className="mt-6 space-y-6">
-                      {footerNavigation.customerService.map((item) => (
-                        <li key={item.name} className="text-sm">
-                          <a
-                            href={item.href}
-                            className="text-gray-500 hover:text-gray-600"
-                          >
-                            {item.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Newsletter section */}
-                <div className="mt-12 md:col-span-8 md:col-start-3 md:row-start-2 md:mt-0 lg:col-span-4 lg:col-start-9 lg:row-start-1">
-                  <h3 className="text-sm font-medium text-gray-900">
-                    Sign up for our newsletter
-                  </h3>
-                  <p className="mt-6 text-sm text-gray-500">
-                    The latest deals and savings, sent to your inbox weekly.
-                  </p>
-                  <form className="mt-2 flex sm:max-w-md">
-                    <label htmlFor="email-address" className="sr-only">
-                      Email address
-                    </label>
-                    <input
-                      id="email-address"
-                      type="text"
-                      autoComplete="email"
-                      required
-                      className="w-full min-w-0 appearance-none rounded-md border border-gray-300 bg-white px-4 py-2 text-base text-gray-900 placeholder-gray-500 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                    />
-                    <div className="ml-4 flex-shrink-0">
-                      <button
-                        type="submit"
-                        className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                      >
-                        Sign up
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-100 py-10 text-center">
-              <p className="text-sm text-gray-500">
-                &copy; 2021 Your Company, Inc. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+       
       </div>
     </div>
   );

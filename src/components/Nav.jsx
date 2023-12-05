@@ -10,8 +10,8 @@ const Nav = ({ showDownloadBtn }) => {
       </a>
       <div className="flex gap-4 items-center">
         <Link to="/view-template"
-          className="z-10 rounded bg-blue-500 text-white m-2 p-2 text-center print:hidden">
-          View Template
+          className="z-10 rounded bg-blue-500 text-white m-2 py-2 px-5 text-center print:hidden">
+          View Templates
         </Link>
       {showDownloadBtn ? (
         <button
